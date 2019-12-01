@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+    <style>
+        .colar{
+            color: coral;
+        }
+        .green{
+            color: lightgreen;
+        }
+    </style>
+</head>
+<body>
+    <span class="name"></span>
+    <div class="chat-window"></div>
+    <input type="text">
+    <button type="button">Send</button>
+   
+    <script defer >
+        const socket = io('http://localhost:3000');
+                const name = prompt('enter user name');
+                const input = document.querySelector("input");                
+                socket.on('news', function (data) {
+                  document.querySelector('span').innerHTML = name;
+                  socket.emit('my other event', name);                            
+                });
+                
+                
+                document.querySelector('button').addEventListener('click', () => {
+                    const msg = input.value;
+                    socket.emit('new-msg', {msg:msg, name:name});
+                    input.value=''; //очищаем наш инпут
+                });
+                
+                socket.on('msg',(data)=>{
+                    const you = document.querySelector('.name').innerHTML;
+                    if(you===data.name){                        
+                        document.querySelector('.chat-window').innerHTML+="<b>"+ "Вы" +": "+"</b>" + data.msg + "<br />";
+                    } else{
+                        document.querySelector('.chat-window').innerHTML+="<b>"+ data.name +": "+"</b>" + data.msg + "<br />"
+                    }; 
+                });
+
+                socket.on('dis',(data)=>{
+                    document.querySelector('.chat-window').innerHTML+="<b>"+ data.name +": "+"</b>" + data.status + "<br />"
+                })
+    </script>
+</body>
+</html>
